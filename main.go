@@ -24,7 +24,11 @@ a specific filename and rename to chosen name
 	fmt.Println("Enter new file name: ")
 	fmt.Scan(&newName)
 
-	files, err := walkDir("/")
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	files, err := walkDir(wd)
 	if err != nil {
 		log.Fatalln(err)
 	}
