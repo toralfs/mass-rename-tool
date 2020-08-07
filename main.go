@@ -60,8 +60,7 @@ a specific filename and rename to chosen name
 func walkDir(root string, fileName string) ([]string, error) {
 	var files []string
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		xs := strings.SplitAfter(path, `\`)
-		if !info.IsDir() && xs[len(xs)-1] == fileName {
+		if !info.IsDir() && filepath.Base(path) == fileName {
 			files = append(files, path)
 		}
 		return nil
