@@ -46,15 +46,20 @@ a specific filename and rename to chosen name
 		fmt.Println(v)
 	}
 	fmt.Printf("\nSure you want to rename to %s?\nPress y, or n to continue\n", newName)
+
 	ans := readInput()
 	if ans == "n" {
 		fmt.Println("Renaming cancelled, press anything to exit.")
 		readInput()
 	} else if ans == "y" {
-		renameFiles(files, string(oldName), string(newName))
-		fmt.Println("Files renamed, press anything to exit")
-		readInput()
+		errs := renameFiles(files, string(oldName), string(newName))
+		if len(errs) > 0 {
+			fmt.Println("Some files could not be renamed, check log for details.")
+		}
+		fmt.Println("All files renamed sucessfully!")
 	}
+	fmt.Println("press anything to exit")
+	readInput()
 }
 
 func walkDir(root string, fileName string) ([]string, error) {
@@ -68,15 +73,19 @@ func walkDir(root string, fileName string) ([]string, error) {
 	return files, err
 }
 
-func renameFiles(files []string, oldName string, newName string) {
+func renameFiles(files []string, oldName string, newName string) []error {
+	var errs []error
 	for _, oldPath := range files {
 		newPath := strings.ReplaceAll(oldPath, oldName, newName)
 		err := os.Rename(oldPath, newPath)
 		if err != nil {
-			log.Printf("Could not rename file at path: %s, error: %v", oldPath, err)
+			e := fmt.Errorf("Could not rename file at path: %s, error: %v", oldPath, err)
+			fmt.Println(e)
+			errs = append(errs, e)
 			continue
 		}
 	}
+	return errs
 }
 
 func readInput() string {
